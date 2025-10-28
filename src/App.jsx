@@ -9,37 +9,66 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [expenses, setExpenses] = useState([]);
-  const [form, setForm] = useState({ title: "", amount: "", category: "", date: "" });
+  const [form, setForm] = useState({
+    title: "",
+    amount: "",
+    category: "",
+    date: "",
+  });
   const [editingId, setEditingId] = useState(null);
   const [filterCategory, setFilterCategory] = useState("");
 
+  // ✅ Fetch Expenses
   const fetchExpenses = async () => {
-    const res = await axios.get(API_URL);
-    setExpenses(res.data);
+    try {
+      const res = await axios.get(API_URL);
+      // Ensure it's always an array
+      if (Array.isArray(res.data)) {
+        setExpenses(res.data);
+      } else {
+        console.error("Unexpected API response:", res.data);
+        setExpenses([]);
+      }
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      setExpenses([]);
+    }
   };
 
-  useEffect(() => { fetchExpenses(); }, []);
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
+  // ✅ Add or Update Expense
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.amount || !form.category || !form.date) return;
 
-    if (editingId) {
-      await axios.put(`${API_URL}/${editingId}`, form);
-      setEditingId(null);
-    } else {
-      await axios.post(API_URL, form);
+    try {
+      if (editingId) {
+        await axios.put(`${API_URL}/${editingId}`, form);
+        setEditingId(null);
+      } else {
+        await axios.post(API_URL, form);
+      }
+      setForm({ title: "", amount: "", category: "", date: "" });
+      fetchExpenses();
+    } catch (err) {
+      console.error("Error submitting expense:", err);
     }
-
-    setForm({ title: "", amount: "", category: "", date: "" });
-    fetchExpenses();
   };
 
+  // ✅ Delete Expense
   const handleDelete = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-    fetchExpenses();
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      fetchExpenses();
+    } catch (err) {
+      console.error("Error deleting expense:", err);
+    }
   };
 
+  // ✅ Edit Expense
   const handleEdit = (exp) => {
     setEditingId(exp._id);
     setForm({
@@ -50,8 +79,14 @@ function App() {
     });
   };
 
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const categories = [...new Set(expenses.map((e) => e.category))];
+  // ✅ Safe Reduce to Prevent Crashes
+  const total = Array.isArray(expenses)
+    ? expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+    : 0;
+
+  const categories = Array.isArray(expenses)
+    ? [...new Set(expenses.map((e) => e.category))]
+    : [];
 
   const filtered = filterCategory
     ? expenses.filter((e) => e.category === filterCategory)
