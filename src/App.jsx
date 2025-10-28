@@ -21,16 +21,18 @@ function App() {
   // ✅ Fetch Expenses
   const fetchExpenses = async () => {
     try {
+      console.log("📡 Fetching from:", API_URL);
       const res = await axios.get(API_URL);
-      // Ensure it's always an array
+
+      // Handle both valid and unexpected API responses
       if (Array.isArray(res.data)) {
         setExpenses(res.data);
       } else {
-        console.error("Unexpected API response:", res.data);
+        console.warn("⚠️ Unexpected API response, got:", res.data);
         setExpenses([]);
       }
     } catch (error) {
-      console.error("Error fetching expenses:", error);
+      console.error("❌ Error fetching expenses:", error.message);
       setExpenses([]);
     }
   };
@@ -54,7 +56,7 @@ function App() {
       setForm({ title: "", amount: "", category: "", date: "" });
       fetchExpenses();
     } catch (err) {
-      console.error("Error submitting expense:", err);
+      console.error("❌ Error submitting expense:", err.message);
     }
   };
 
@@ -64,7 +66,7 @@ function App() {
       await axios.delete(`${API_URL}/${id}`);
       fetchExpenses();
     } catch (err) {
-      console.error("Error deleting expense:", err);
+      console.error("❌ Error deleting expense:", err.message);
     }
   };
 
@@ -79,10 +81,11 @@ function App() {
     });
   };
 
-  // ✅ Safe Reduce to Prevent Crashes
-  const total = Array.isArray(expenses)
-    ? expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
-    : 0;
+  // ✅ Safe calculations
+  const total =
+    Array.isArray(expenses) && expenses.length > 0
+      ? expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+      : 0;
 
   const categories = Array.isArray(expenses)
     ? [...new Set(expenses.map((e) => e.category))]
@@ -118,7 +121,7 @@ function App() {
         handleDelete={handleDelete}
       />
 
-      <ExpenseChart expenses={expenses} />
+      <ExpenseChart expenses={Array.isArray(expenses) ? expenses : []} />
     </div>
   );
 }
