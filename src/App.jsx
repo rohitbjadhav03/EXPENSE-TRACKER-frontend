@@ -5,7 +5,7 @@ import ExpenseFilter from "./components/ExpenseFilter";
 import ExpenseTable from "./components/ExpenseTable";
 import ExpenseChart from "./components/ExpenseChart";
 
-const API_URL = "http://localhost:5000/api/expenses"; // replace with Render URL after deploy
+const API_URL = "import.meta.env.VITE_API_URL;"; // replace with Render URL after deploy
 
 function App() {
   const [expenses, setExpenses] = useState([]);
