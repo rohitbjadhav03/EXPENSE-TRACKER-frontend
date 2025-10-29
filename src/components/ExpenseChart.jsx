@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#D72638"];
 
 const ExpenseChart = ({ expenses }) => {
-  // ✅ Handle undefined, null, or invalid data
+  //  Handle undefined, null, or invalid data
   if (!Array.isArray(expenses) || expenses.length === 0) {
     return (
       <p className="text-center text-gray-500 mt-10">
@@ -12,7 +12,7 @@ const ExpenseChart = ({ expenses }) => {
     );
   }
 
-  // ✅ Safe mapping
+  // Safe mapping
   const categories = [...new Set(expenses.map((e) => e.category))];
 
   const categoryData = categories.map((cat) => ({
@@ -22,7 +22,7 @@ const ExpenseChart = ({ expenses }) => {
       .reduce((sum, e) => sum + (Number(e.amount) || 0), 0),
   }));
 
-  // ✅ If all categories are 0 or invalid, skip rendering chart
+  // If all categories are 0 or invalid, skip rendering chart
   const validData = categoryData.filter((c) => c.value > 0);
   if (validData.length === 0) {
     return (

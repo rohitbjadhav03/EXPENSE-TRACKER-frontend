@@ -23,25 +23,25 @@ function App() {
     console.log("🔗 API_URL loaded:", API_URL);
   }, []);
 
-  // ✅ Fetch Expenses with debug logs
+  //  Fetch Expenses with debug logs
   const fetchExpenses = async () => {
     try {
       console.log("📡 Fetching from:", API_URL);
       const res = await axios.get(API_URL);
 
       // Show response for debugging
-      console.log("🌐 Response received:", res.data);
+      console.log(" Response received:", res.data);
 
       // Handle valid response
       if (Array.isArray(res.data)) {
         setExpenses(res.data);
       } else {
         // Show warning and keep expenses empty
-        console.warn("⚠️ Unexpected API response, got:", res.data);
+        console.warn(" Unexpected API response, got:", res.data);
         setExpenses([]);
       }
     } catch (error) {
-      console.error("❌ Error fetching expenses:", error.message, error);
+      console.error(" Error fetching expenses:", error.message, error);
       setExpenses([]);
     }
   };
@@ -50,7 +50,7 @@ function App() {
     fetchExpenses();
   }, []);
 
-  // ✅ Add or Update Expense
+  // Add or Update Expense
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.amount || !form.category || !form.date) return;
@@ -65,11 +65,11 @@ function App() {
       setForm({ title: "", amount: "", category: "", date: "" });
       fetchExpenses();
     } catch (err) {
-      console.error("❌ Error submitting expense:", err.message, err);
+      console.error(" Error submitting expense:", err.message, err);
     }
   };
 
-  // ✅ Delete Expense
+  // Delete Expense
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${API_URL}/${id}`);
@@ -79,7 +79,7 @@ function App() {
     }
   };
 
-  // ✅ Edit Expense
+  //  Edit Expense
   const handleEdit = (exp) => {
     setEditingId(exp._id);
     setForm({
@@ -90,7 +90,7 @@ function App() {
     });
   };
 
-  // ✅ Safe calculations
+  // Safe calculations
   const total =
     Array.isArray(expenses) && expenses.length > 0
       ? expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
