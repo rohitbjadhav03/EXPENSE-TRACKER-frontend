@@ -18,21 +18,30 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [filterCategory, setFilterCategory] = useState("");
 
-  // ✅ Fetch Expenses
+  // Debug logging to check API endpoint
+  useEffect(() => {
+    console.log("🔗 API_URL loaded:", API_URL);
+  }, []);
+
+  // ✅ Fetch Expenses with debug logs
   const fetchExpenses = async () => {
     try {
       console.log("📡 Fetching from:", API_URL);
       const res = await axios.get(API_URL);
 
-      // Handle both valid and unexpected API responses
+      // Show response for debugging
+      console.log("🌐 Response received:", res.data);
+
+      // Handle valid response
       if (Array.isArray(res.data)) {
         setExpenses(res.data);
       } else {
+        // Show warning and keep expenses empty
         console.warn("⚠️ Unexpected API response, got:", res.data);
         setExpenses([]);
       }
     } catch (error) {
-      console.error("❌ Error fetching expenses:", error.message);
+      console.error("❌ Error fetching expenses:", error.message, error);
       setExpenses([]);
     }
   };
@@ -56,7 +65,7 @@ function App() {
       setForm({ title: "", amount: "", category: "", date: "" });
       fetchExpenses();
     } catch (err) {
-      console.error("❌ Error submitting expense:", err.message);
+      console.error("❌ Error submitting expense:", err.message, err);
     }
   };
 
@@ -66,7 +75,7 @@ function App() {
       await axios.delete(`${API_URL}/${id}`);
       fetchExpenses();
     } catch (err) {
-      console.error("❌ Error deleting expense:", err.message);
+      console.error("❌ Error deleting expense:", err.message, err);
     }
   };
 
@@ -100,27 +109,23 @@ function App() {
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">
         💰 Expense Tracker
       </h1>
-
       <ExpenseForm
         form={form}
         setForm={setForm}
         handleSubmit={handleSubmit}
         editingId={editingId}
       />
-
       <ExpenseFilter
         categories={categories}
         total={total}
         filterCategory={filterCategory}
         setFilterCategory={setFilterCategory}
       />
-
       <ExpenseTable
         expenses={filtered}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
-
       <ExpenseChart expenses={Array.isArray(expenses) ? expenses : []} />
     </div>
   );
