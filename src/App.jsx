@@ -23,25 +23,22 @@ function App() {
     console.log("🔗 API_URL loaded:", API_URL);
   }, []);
 
-  //  Fetch Expenses with debug logs
+  // ✅ FIXED: Fetch Expenses - ADDED /api/expenses
   const fetchExpenses = async () => {
     try {
-      console.log("📡 Fetching from:", API_URL);
-      const res = await axios.get(API_URL);
+      console.log("📡 Fetching from:", `${API_URL}/api/expenses`);
+      const res = await axios.get(`${API_URL}/api/expenses`);  // ← CHANGED
 
-      // Show response for debugging
-      console.log(" Response received:", res.data);
+      console.log("✅ Response received:", res.data);
 
-      // Handle valid response
       if (Array.isArray(res.data)) {
         setExpenses(res.data);
       } else {
-        // Show warning and keep expenses empty
-        console.warn(" Unexpected API response, got:", res.data);
+        console.warn("⚠️ Unexpected API response, got:", res.data);
         setExpenses([]);
       }
     } catch (error) {
-      console.error(" Error fetching expenses:", error.message, error);
+      console.error("❌ Error fetching expenses:", error.message, error);
       setExpenses([]);
     }
   };
@@ -50,36 +47,45 @@ function App() {
     fetchExpenses();
   }, []);
 
-  // Add or Update Expense
+  // ✅ FIXED: Add or Update Expense - ADDED /api/expenses + Number(amount)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.amount || !form.category || !form.date) return;
 
     try {
+      const expenseData = {
+        title: form.title,
+        amount: Number(form.amount),  // ← FIXED: Convert to number
+        category: form.category,
+        date: form.date,              // ← YYYY-MM-DD format
+      };
+
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, form);
+        // ✅ FIXED: PUT /api/expenses/:id
+        await axios.put(`${API_URL}/api/expenses/${editingId}`, expenseData);
         setEditingId(null);
       } else {
-        await axios.post(API_URL, form);
+        // ✅ FIXED: POST /api/expenses
+        await axios.post(`${API_URL}/api/expenses`, expenseData);
       }
       setForm({ title: "", amount: "", category: "", date: "" });
       fetchExpenses();
     } catch (err) {
-      console.error(" Error submitting expense:", err.message, err);
+      console.error("❌ Error submitting expense:", err.message, err);
     }
   };
 
-  // Delete Expense
+  // ✅ FIXED: Delete Expense - ADDED /api/expenses
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/api/expenses/${id}`);  // ← CHANGED
       fetchExpenses();
     } catch (err) {
       console.error("❌ Error deleting expense:", err.message, err);
     }
   };
 
-  //  Edit Expense
+  // Edit Expense
   const handleEdit = (exp) => {
     setEditingId(exp._id);
     setForm({
